@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10243a">
+  <title>Japanese Seasoning Substitute Calculator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #10243a;
+      --navy-soft: #203a54;
+      --red: #c94343;
+      --paper: #fffdf9;
+      --ink: #263442;
+      --muted: #687786;
+      --line: #e5e9ed;
+      --wash: #f3f6f8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 16px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(201, 67, 67, .07), transparent 28rem),
+        #f3f5f6;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .page {
+      width: min(100%, 680px);
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--navy);
+      font-size: .84rem;
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border-radius: 10px;
+      color: white;
+      background: var(--red);
+      font-size: 1rem;
+    }
+
+    header { margin-bottom: 22px; }
+
+    h1 {
+      margin: 0 0 10px;
+      color: var(--navy);
+      font-size: clamp(2rem, 7vw, 3rem);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+
+    .intro {
+      max-width: 54ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid rgba(16, 36, 58, .08);
+      border-radius: 20px;
+      background: var(--paper);
+      box-shadow: 0 18px 48px rgba(16, 36, 58, .09);
+    }
+
+    .form { padding: clamp(20px, 5vw, 32px); }
+
+    .field { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--navy);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .field-hint {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    select, input {
+      width: 100%;
+      min-height: 50px;
+      padding: 12px 14px;
+      border: 1px solid #d8dfe5;
+      border-radius: 11px;
+      outline: none;
+      color: var(--ink);
+      background: white;
+      font: inherit;
+      font-size: 1rem;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--navy-soft);
+      box-shadow: 0 0 0 3px rgba(32, 58, 84, .12);
+    }
+
+    .amount-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    button {
+      display: flex;
+      width: 100%;
+      min-height: 54px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 4px;
+      border: 0;
+      border-radius: 12px;
+      color: white;
+      background: var(--navy);
+      cursor: pointer;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 750;
+      transition: transform .15s, background .15s;
+    }
+
+    button:hover { background: var(--navy-soft); }
+    button:active { transform: translateY(1px); }
+    button:focus-visible { outline: 3px solid rgba(201, 67, 67, .45); outline-offset: 3px; }
+
+    .result {
+      display: none;
+      padding: clamp(20px, 5vw, 30px);
+      border-top: 1px solid var(--line);
+      background: white;
+    }
+
+    .result.visible { display: block; }
+
+    .result-kicker {
+      margin: 0 0 8px;
+      color: var(--red);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .result h2 {
+      margin: 0 0 16px;
+      color: var(--navy);
+      font-size: 1.35rem;
+    }
+
+    .recipe {
+      padding: 16px;
+      border-left: 4px solid var(--red);
+      border-radius: 0 12px 12px 0;
+      background: var(--wash);
+      color: var(--navy);
+      font-size: 1.05rem;
+      font-weight: 750;
+      line-height: 1.55;
+    }
+
+    .tip {
+      margin: 15px 0 0;
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.65;
+    }
+
+    .tip strong { color: var(--navy); }
+
+    .footnote {
+      margin: 16px 4px 0;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 420px) {
+      body { padding: 22px 12px; }
+      .amount-row { grid-template-columns: 1fr; gap: 0; }
+      .card { border-radius: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">和</span> Pantry helper</div>
+
+    <header>
+      <h1>Japanese Seasoning<br>Substitute Calculator</h1>
+      <p class="intro">Missing a Japanese kitchen staple? Choose an ingredient and amount to get a quick, practical substitute using common pantry ingredients.</p>
+    </header>
+
+    <section class="card" aria-label="Substitute calculator">
+      <form class="form" id="substituteForm">
+        <div class="field">
+          <label for="seasoning">Seasoning to replace</label>
+          <select id="seasoning" required>
+            <option value="mirin">Mirin</option>
+            <option value="sake">Japanese Cooking Sake</option>
+            <option value="dashi">Dashi Stock</option>
+            <option value="panko">Panko Breadcrumbs</option>
+            <option value="shoyu">Shoyu / Soy Sauce</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="quantity">Recipe amount</label>
+          <div class="amount-row">
+            <input id="quantity" type="number" min="0.01" step="any" value="1" inputmode="decimal" required aria-label="Recipe quantity">
+            <select id="unit" aria-label="Recipe unit">
+              <option value="tbsp">Tablespoon</option>
+              <option value="tsp">Teaspoon</option>
+              <option value="cup">Cup</option>
+              <option value="ml">ml</option>
+            </select>
+          </div>
+          <span class="field-hint">Fractions and decimals are supported, such as 0.5 or 1.25.</span>
+        </div>
+
+        <button type="submit">Calculate Substitute <span aria-hidden="true">→</span></button>
+      </form>
+
+      <section class="result" id="result" aria-live="polite" aria-atomic="true">
+        <p class="result-kicker">Your substitute</p>
+        <h2 id="resultTitle"></h2>
+        <div class="recipe" id="recipe"></div>
+        <p class="tip" id="tip"></p>
+      </section>
+    </section>
+
+    <p class="footnote">These are practical starting points. Taste and adjust as you cook.</p>
+  </main>
+
+  <script>
+    const unitInfo = {
+      tbsp: { label: "tbsp", ml: 15 },
+      tsp:  { label: "tsp", ml: 5 },
+      cup:  { label: "cup", ml: 240 },
+      ml:   { label: "ml", ml: 1 }
+    };
+
+    const recipes = {
+      mirin: {
+        name: "Mirin",
+        parts: [
+          { ingredient: "Dry white wine", ratio: 1, unit: "volume" },
+          { ingredient: "Sugar", ratio: 0.5, unit: "tsp-per-tbsp" }
+        ],
+        tip: "Mix the wine and sugar until dissolved. For each tablespoon of mirin, use 1 tablespoon dry white wine plus 1/2 teaspoon sugar. For a non-alcoholic option, use white grape juice with a small pinch of sugar."
+      },
+      sake: {
+        name: "Japanese Cooking Sake",
+        parts: [
+          { ingredient: "Dry white wine", ratio: 1, unit: "volume" }
+        ],
+        tip: "Use an equal amount of dry white wine. For a non-alcoholic option, use water or unsalted broth with a small squeeze of lemon. Reduce added salt if your recipe uses salted cooking sake."
+      },
+      dashi: {
+        name: "Dashi Stock",
+        parts: [
+          { ingredient: "Water", ratio: 1, unit: "volume" },
+          { ingredient: "Instant broth powder", ratio: 0.5, unit: "tsp-per-cup" }
+        ],
+        tip: "Dissolve the broth powder in the water. Use vegetable broth for a vegetarian substitute, or light chicken broth for a fuller flavor. Check its saltiness before seasoning the dish."
+      },
+      panko: {
+        name: "Panko Breadcrumbs",
+        parts: [
+          { ingredient: "Coarse dry breadcrumbs", ratio: 1, unit: "volume" }
+        ],
+        tip: "Use an equal amount of coarse dry breadcrumbs. For a lighter, crunchier coating, pulse plain cornflakes into coarse crumbs. Keep the crumbs chunky rather than powdery."
+      },
+      shoyu: {
+        name: "Shoyu / Soy Sauce",
+        parts: [
+          { ingredient: "Soy sauce", ratio: 1, unit: "volume" }
+        ],
+        tip: "Use an equal amount of regular soy sauce. If replacing with tamari, start with the same amount and adjust to taste. For a lower-sodium option, use reduced-sodium soy sauce."
+      }
+    };
+
+    const form = document.getElementById("substituteForm");
+    const result = document.getElementById("result");
+
+    function formatAmount(value) {
+      if (value < 0.01) return value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+      if (value < 10) return Number(value.toFixed(2)).toString();
+      return Number(value.toFixed(1)).toString();
+    }
+
+    function displayMeasure(ml) {
+      if (ml >= 240 && Math.abs(ml / 240 - Math.round(ml / 240)) < 0.001) {
+        const cups = Math.round(ml / 240);
+        return `${formatAmount(cups)} ${cups === 1 ? "cup" : "cups"}`;
+      }
+      if (ml >= 15 && Math.abs(ml / 15 - Math.round(ml / 15)) < 0.001) {
+        const tbsp = Math.round(ml / 15);
+        return `${formatAmount(tbsp)} tbsp`;
+      }
+      if (ml >= 5 && Math.abs(ml / 5 - Math.round(ml / 5)) < 0.001) {
+        const tsp = Math.round(ml / 5);
+        return `${formatAmount(tsp)} tsp`;
+      }
+      return `${formatAmount(ml)} ml`;
+    }
+
+    function calculate(event) {
+      event.preventDefault();
+
+      const seasoningKey = document.getElementById("seasoning").value;
+      const quantity = Number(document.getElementById("quantity").value);
+      const unitKey = document.getElementById("unit").value;
+
+      if (!Number.isFinite(quantity) || quantity <= 0) return;
+
+      const seasoning = recipes[seasoningKey];
+      const inputMl = quantity * unitInfo[unitKey].ml;
+      const inputDisplay = `${formatAmount(quantity)} ${unitInfo[unitKey].label}`;
+
+      const substitutions = seasoning.parts.map(part => {
+        if (part.unit === "volume") {
+          return `${part.ingredient} (${displayMeasure(inputMl * part.ratio)})`;
+        }
+
+        if (part.unit === "tsp-per-tbsp") {
+          const tspAmount = (inputMl / 15) * part.ratio;
+          return `${part.ingredient} (${displayMeasure(tspAmount * 5)})`;
+        }
+
+        if (part.unit === "tsp-per-cup") {
+          const tspAmount = (inputMl / 240) * part.ratio;
+          return `${part.ingredient} (${displayMeasure(tspAmount * 5)})`;
+        }
+
+        return `${part.ingredient} (${displayMeasure(inputMl * part.ratio)})`;
+      });
+
+      document.getElementById("resultTitle").textContent = `${inputDisplay} ${seasoning.name}`;
+      document.getElementById("recipe").textContent = substitutions.join(" + ");
+      document.getElementById("tip").innerHTML = `<strong>How to use it:</strong> ${seasoning.tip}`;
+      result.classList.add("visible");
+      result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    form.addEventListener("submit", calculate);
+  </script>
+</body>
+</html>
