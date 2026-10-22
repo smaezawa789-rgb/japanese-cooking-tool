@@ -36,6 +36,37 @@
       margin: 0 auto;
     }
 
+    .hub-link {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 22px;
+      padding: 10px 18px;
+      border: 1px solid var(--red);
+      border-radius: 999px;
+      color: white;
+      background: var(--red);
+      font-size: .96rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .2s, border-color .2s, box-shadow .2s, transform .15s;
+    }
+
+    .hub-link:hover {
+      border-color: #ad3434;
+      background: #ad3434;
+      box-shadow: 0 5px 14px rgba(173, 52, 52, .22);
+      transform: translateY(-1px);
+    }
+
+    .hub-link:active { transform: translateY(1px); }
+
+    .hub-link:focus-visible {
+      outline: 3px solid rgba(201, 67, 67, .45);
+      outline-offset: 3px;
+    }
+
     .brand {
       display: flex;
       align-items: center;
@@ -213,6 +244,8 @@
 </head>
 <body>
   <main class="page">
+    <a class="hub-link" href="https://japanese-cooking-hub.vercel.app/" aria-label="Back to Hub Home">← Back to Hub Home</a>
+
     <div class="brand"><span class="brand-mark" aria-hidden="true">和</span> Pantry helper</div>
 
     <header>
