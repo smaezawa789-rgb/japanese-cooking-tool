@@ -219,6 +219,7 @@
       font-size: 1.05rem;
       font-weight: 750;
       line-height: 1.55;
+      white-space: pre-line;
     }
 
     .tip {
@@ -332,16 +333,19 @@
       panko: {
         name: "Panko Breadcrumbs",
         parts: [
-          { ingredient: "Coarse dry breadcrumbs", ratio: 1, unit: "volume" }
+          { ingredient: "Crushed plain cornflakes", ratio: 1, unit: "volume" }
         ],
-        tip: "Use an equal amount of coarse dry breadcrumbs. For a lighter, crunchier coating, pulse plain cornflakes into coarse crumbs. Keep the crumbs chunky rather than powdery."
+        tip: "Crush plain cornflakes into coarse flakes and measure an equal volume. They make a light, crunchy coating; avoid crushing them into a fine powder."
       },
       shoyu: {
         name: "Shoyu / Soy Sauce",
-        parts: [
-          { ingredient: "Soy sauce", ratio: 1, unit: "volume" }
+        alternatives: [
+          { name: "Fish sauce", ratio: 0.5, note: "Use half the amount to start; it has a strong fish flavor." },
+          { name: "Worcestershire sauce", ratio: 1, note: "Use an equal amount; it adds sweetness and tang." },
+          { name: "Dashi stock + salt", ratio: 1, saltPerTbsp: 0.125, note: "Use an equal amount of dashi, plus 1/8 tsp salt per tablespoon of soy sauce." },
+          { name: "Coconut aminos", ratio: 1, note: "Use an equal amount; it is sweeter and less salty." }
         ],
-        tip: "Use an equal amount of regular soy sauce. If replacing with tamari, start with the same amount and adjust to taste. For a lower-sodium option, use reduced-sodium soy sauce."
+        tip: "Choose one option above to suit your dish and pantry. Taste as you go: fish sauce is pungent, Worcestershire is sweeter and tangier, dashi with salt gives savory flavor without soy, and coconut aminos are sweeter and less salty."
       }
     };
 
@@ -383,7 +387,16 @@
       const inputMl = quantity * unitInfo[unitKey].ml;
       const inputDisplay = `${formatAmount(quantity)} ${unitInfo[unitKey].label}`;
 
-      const substitutions = seasoning.parts.map(part => {
+      const substitutions = seasoning.alternatives
+        ? seasoning.alternatives.map(alternative => {
+            const amountMl = inputMl * alternative.ratio;
+            if (alternative.saltPerTbsp) {
+              const saltTsp = (inputMl / 15) * alternative.saltPerTbsp;
+              return `${alternative.name}: ${displayMeasure(amountMl)} + ${formatAmount(saltTsp)} tsp salt`;
+            }
+            return `${alternative.name}: ${displayMeasure(amountMl)} ( ${alternative.note} )`;
+          }).join("\nOR\n")
+        : seasoning.parts.map(part => {
         if (part.unit === "volume") {
           return `${part.ingredient} (${displayMeasure(inputMl * part.ratio)})`;
         }
@@ -399,10 +412,10 @@
         }
 
         return `${part.ingredient} (${displayMeasure(inputMl * part.ratio)})`;
-      });
+      }).join(" + ");
 
       document.getElementById("resultTitle").textContent = `${inputDisplay} ${seasoning.name}`;
-      document.getElementById("recipe").textContent = substitutions.join(" + ");
+      document.getElementById("recipe").textContent = substitutions;
       document.getElementById("tip").innerHTML = `<strong>How to use it:</strong> ${seasoning.tip}`;
       result.classList.add("visible");
       result.scrollIntoView({ behavior: "smooth", block: "nearest" });
